@@ -1,0 +1,39 @@
+// C++ code
+//
+
+void initADC(){
+  // Set reference voltage to AVcc
+  ADMUX |= (1<<REFS0|1<<MUX0);
+  // Enable ADC with prescalar 128
+  ADCSRA |= (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+}
+
+void initPORT(){
+  DDRB |= (1<<DDB3); // set PB3 as output
+  PORTB |= (1<<PORTB2); //PB2 connects to photo resistor
+  DDRB &= ~(1<<DDB2); // set PB2 as input
+}
+
+
+void setup()
+{
+  initADC();
+  initPORT();
+}
+
+void loop()
+{
+
+  // start conversation and wait for conversion complete
+  ADCSRA |= (1<<ADSC);
+  while (ADCSRA&(1<<ADSC));
+  // adcValue to voltage (mV)
+  uint16_t adcValue = ADC;
+
+  if(adcValue>512){
+    PORTB |= (1 << PINB3); 
+  }
+  else {
+    PORTB &= ~(1 << PINB3);  
+  }
+}
